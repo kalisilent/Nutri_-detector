@@ -9,14 +9,44 @@
 
 ---
 
-## Download
 
-| Platform | Link |
-|----------|------|
-| **Android (ARM64)** | [`app-arm64-v8a-release.apk`](./build/app/outputs/flutter-apk/app-arm64-v8a-release.apk) |
 
-> **Requirements:** Android 8.0+ (API 26), ARM64 processor, ~200MB free storage.  
-> Enable **"Install from unknown sources"** in your phone settings before installing.
+If you want to generate the APK yourself:
+
+**1. Clone the repo**
+
+```bash
+git clone https://github.com/kalisilent/Nutri_-detector.git
+cd Nutri_-detector
+```
+
+**2. Install dependencies**
+
+```bash
+flutter pub get
+```
+
+**3. Build release APK**
+
+```bash
+flutter build apk --release --target-platform android-arm64
+```
+
+**4. APK location**
+
+After build, the APK will be generated at:
+
+```
+build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+**5. Install on device**
+
+- Transfer APK to your phone
+- Enable: **Settings → Security → Install unknown apps**
+- Tap APK → **Install**
+
+> ⚠️ **Requirements:** Android 8.0+ (API 26+), ARM64 device, ~200MB free storage.
 
 ---
 
@@ -199,20 +229,6 @@ nutriscan-offline/
 ---
 
 ## Running Locally
-
-### Flutter App
-
-```bash
-# Install Flutter dependencies
-flutter pub get
-
-# Run on connected Android device
-flutter run -d <device-id>
-
-# Build release APK
-flutter build apk --target-platform android-arm64
-# Output: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-```
 
 ### Backend (Optional — for cloud fallback)
 
