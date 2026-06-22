@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+key.properties
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# Flutter / Dart
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/ios/Pods/
+
+# ML assets (large binaries — share via Cloud Storage)
+backend/ml_assets/*.pkl
+backend/ml_assets/*.joblib
+!backend/ml_assets/*.pkl
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local uploads
+/tmp/nutriscan-uploads/

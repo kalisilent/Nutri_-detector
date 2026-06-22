@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Flutter
+build/
+.dart_tool/
+
+# VS Code
+.vscode/
+
+# Environment
+.env
+
+# Datasets
+*.zip
+datasets/
+en.openfoodfacts.org.products.tsv.zip
+
+# ML Models
+
+# ML Models (IGNORE ALL - safest)
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Logs
+*.log

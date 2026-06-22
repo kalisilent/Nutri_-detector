@@ -1,0 +1,49 @@
+# Local development stack: API + Postgres (pgvector).
+# Run from project root:  docker compose -f infra/docker/docker-compose.yml up
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nutriscan
+      POSTGRES_PASSWORD: nutriscan
+      POSTGRES_DB: nutriscan
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nutriscan"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENV: development
+      DEBUG: "true"
+      SECRET_KEY: dev-only-change-me
+      DATABASE_URL: postgresql://nutriscan:nutriscan@postgres:5432/nutriscan
+      USE_LOCAL_STORAGE: "true"
+      LLM_API_KEY: ""
+      PORT: "8080"
+    ports: ["8080:8080"]
+    volumes:
+      - ../../backend/ml_assets:/app/ml_assets:ro
+      - uploads:/tmp/nutriscan-uploads
+    command: >
+      sh -c "alembic upgrade head &&
+             python scripts/seed_kb.py &&
+             gunicorn app.main:app --worker-class uvicorn.workers.UvicornWorker
+                     --workers 2 --bind 0.0.0.0:8080 --timeout 120"
+
+volumes:
+  pgdata:
+  uploads:

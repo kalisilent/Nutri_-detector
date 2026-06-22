@@ -1,0 +1,42 @@
+name: nutriscan
+description: Scan food packets, understand ingredients, get health grades.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # State management
+  flutter_riverpod: ^2.6.1
+  # Navigation
+  go_router: ^14.6.2
+  # Networking
+  dio: ^5.7.0
+  # Camera + images
+  camera: ^0.11.0
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  hive_flutter: ^1.1.0
+  # Firebase
+  firebase_core: ^3.8.1
+  firebase_crashlytics: ^4.2.0
+  firebase_analytics: ^11.3.6
+  # UI
+  fl_chart: ^0.69.2
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

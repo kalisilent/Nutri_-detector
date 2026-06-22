@@ -1,0 +1,60 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: us-central1
+  SERVICE: nutriscan-api
+  REPO: nutriscan
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write           # required for Workload Identity Federation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build & push image
+        working-directory: backend
+        run: |
+          IMAGE=${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.REPO }}/api:${{ github.sha }}
+          docker build -t $IMAGE -t ${IMAGE%:*}:latest .
+          docker push $IMAGE
+          docker push ${IMAGE%:*}:latest
+
+      - name: Run database migrations
+        run: |
+          gcloud run jobs execute nutriscan-migrate \
+            --region=${{ env.GCP_REGION }} --wait || true
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.REPO }}/api:${{ github.sha }} \
+            --region ${{ env.GCP_REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --cpu 2 --memory 2Gi \
+            --min-instances 0 --max-instances 10 \
+            --concurrency 40 --timeout 120 \
+            --set-cloudsql-instances ${{ env.GCP_PROJECT }}:${{ env.GCP_REGION }}:nutriscan-db \
+            --set-secrets SECRET_KEY=jwt-secret:latest,DATABASE_URL=db-url:latest,LLM_API_KEY=llm-key:latest \
+            --set-env-vars ENV=production,USE_LOCAL_STORAGE=false,GCS_BUCKET=nutriscan-scans
